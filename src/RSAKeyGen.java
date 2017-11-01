@@ -1,3 +1,5 @@
+package src;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.lang.Math;
@@ -9,23 +11,10 @@ import java.io.IOException;
 
 class RSAKeyGen{
 
-	class OpPar {
-
-		OpPar(String publicFileName, String secretFileName, int securityParameter){
-			this.publicFileName = publicFileName;
-			this. secretFileName = secretFileName;
-			this.securityParameter = securityParameter;
-		}
-
-		String publicFileName;
-		String secretFileName;
-		int securityParameter;
-		
-	}
 
 	RSAKeyGen(String[] args){
-		OpPar options = getParameters(args);
-		if (options.securityParameter == -1){
+		getParameters(args);
+		if (securityParameter == -1){
 
 			System.err.printf("Usage: rsa-keygen -p [public key file] -s [secret key file] -n [number of bits in key]");
 			System.exit(1);
@@ -33,27 +22,26 @@ class RSAKeyGen{
 
 		SecureRandom rand = new SecureRandom();
 
-		PrimeAndOrder po;
 		BigInteger e;
 
 		do{
-			po = calcuateN(options.securityParameter, rand);
+			calcuateN(securityParameter, rand);
 
 			e = picke(rand);
 
-		}while (!(e.gcd(po.order).compareTo(BigInteger.ONE) == 0));
+		}while (!(e.gcd(order).compareTo(BigInteger.ONE) == 0));
 
-		BigInteger d = e.modInverse(po.order);
+		BigInteger d = e.modInverse(order);
 
 
-		writePublicKey(options.securityParameter, po.N, e, options.publicFileName);
+		writePublicKey(securityParameter, N, e, publicKeyFilename);
 
-		writeSecretKey(options.securityParameter, po.N, d, options.secretFileName);
+		writeSecretKey(securityParameter, N, d, secretKeyFilename);
 			
 
 	}
 
-	OpPar getParameters(String [] args){
+	void getParameters(String [] args){
 		if( args.length == 6){
 
 			String pub = "";
@@ -82,51 +70,44 @@ class RSAKeyGen{
 			}
 
 			if(pubFlag && secFlag && secParFlag && !errorFlag){
-				return new OpPar(pub,sec,secPar);
+				
+				secretKeyFilename = sec;
+				publicKeyFilename = pub;
+				securityParameter = secPar;
+
+				return;
 			}
 		}
 		
 		System.err.printf("Usage: rsa-keygen -p [public key file] -s [secret key file] -n [number of bits in key]");
 		System.exit(1);
 
-		return new OpPar("","",-1);
+		secretKeyFilename = "";
+		publicKeyFilename = "";
+		securityParameter = -1;
 
 	}
 
-	class PrimeAndOrder {
-
-		PrimeAndOrder(BigInteger N, BigInteger order){
-			this.N = N;
-			this.order = order;
-		}
-
-		BigInteger N;
-		BigInteger order;
-		
-	}
-
-	PrimeAndOrder calcuateN(int nbits, SecureRandom secRandom){
+	void calcuateN(int nbits, SecureRandom secRandom){
 		int p1bits = nbits/2;
 		int p2bits = nbits - p1bits;
 
 		BigInteger prime1 = BigInteger.probablePrime(p1bits,secRandom);
 		BigInteger prime2 = BigInteger.probablePrime(p2bits,secRandom);
 
-		BigInteger N = prime1.multiply(prime2);
+		BigInteger N_cal = prime1.multiply(prime2);
 
-		while(N.bitLength() != nbits){
+		while(N_cal.bitLength() != nbits){
 			prime1 = BigInteger.probablePrime(p1bits+1,secRandom);
-			N = prime1.multiply(prime2);
+			N_cal = prime1.multiply(prime2);
 		}
 
 		prime1 = prime1.subtract(BigInteger.ONE);
 		prime2 = prime2.subtract(BigInteger.ONE);
 
-		BigInteger order = prime1.multiply(prime2);
+		order = prime1.multiply(prime2);
 
-		PrimeAndOrder ret = new PrimeAndOrder(N, order);
-
-		return ret;
+		N = N_cal;
 	}
 
 	BigInteger picke(SecureRandom rand){
@@ -175,6 +156,12 @@ class RSAKeyGen{
 		
 	}
 
+	BigInteger N;
+	BigInteger order;
+
+	int securityParameter;
+	String publicKeyFilename;
+	String secretKeyFilename;
 
 	public static void main(String[] args) {
 		new RSAKeyGen(args);
