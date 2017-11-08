@@ -11,6 +11,15 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.Scanner;
 
+/*
+Thomas Jean
+COSC 483
+Project 2
+RSADec.java will implement the decryption of an element in Z_n*
+mod N raised to the d using RSA private key.
+The modular arithmetic is done by the java BigInteger library.
+*/
+
 
 class RSADec{
 
@@ -21,29 +30,13 @@ class RSADec{
 
 		optionParser(args);
 
-		/*
-		System.out.printf("Input File: %s%n",inputFileName);
-		System.out.printf("Output File: %s%n",outputFileName);
-		System.out.printf("Key File: %s%n",keyFileName);
-		*/
-
 		readKey();
 
-		/*
-		System.out.printf("N bits: %d%n",nBits);
-		System.out.printf("N: %s%n",N.toString());
-		System.out.printf("d: %s%n",d.toString());
-		*/
-
 		readInputFile();
-
-		//System.out.printf("input: %s%n",input.toString());
 
 		decrypt();
 
 		depadElement();
-
-		//System.out.printf("output: %s%n",unpaddedElement.toString());
 
 		writeOutput();
 
@@ -134,10 +127,19 @@ class RSADec{
 
 		byte[] unpaddedArray = new byte[l];
 
+		/*
+		All elements after the first zero byte are considered
+		part of the message. If the message was smaller than
+		the n/2 -24 bits space then there will be leading zero
+		when the array is used to construct the big integer for
+		output these bytes are discarded as they do not affect
+		the value of the integer.
+		*/
 
 		for(int i = z+1; i < decryptArray.length; i++){
 			unpaddedArray[i-(z+1)] = decryptArray[i];
 		}
+
 
 		unpaddedElement = new BigInteger(unpaddedArray);
 

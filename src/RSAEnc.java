@@ -11,6 +11,14 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.Scanner;
 
+/*
+Thomas Jean
+COSC 483
+Project 2
+RSAEnc.java will implement the encryption of an element in Z_n*
+mod N raised to the e using RSA public key.
+The modular arithmetic is done by the java BigInteger library.
+*/
 
 
 
@@ -23,29 +31,18 @@ class RSAEnc{
 
 		optionParser(args);
 
-		/*
-		System.out.printf("Input File: %s%n",inputFileName);
-		System.out.printf("Output File: %s%n",outputFileName);
-		System.out.printf("Key File: %s%n",keyFileName);
-		*/
 
 		readKey();
 
-		/*
-		System.out.printf("N bits: %d%n",nBits);
-		System.out.printf("N: %s%n",N.toString());
-		System.out.printf("e: %s%n",e.toString());
-		*/
 
 		readInputFile();
 
-		//System.out.printf("input: %s%n",input.toString());
 
 		constructElement();
 
+
 		encrypt();
 
-		//System.out.printf("output: %s%n",encryptedElement.toString());
 
 		writeOutput();
 
@@ -119,7 +116,7 @@ class RSAEnc{
 	    }
 
 	}
-
+	
 	void constructElement(){
 		int rBits = nBits/2;
 
@@ -140,7 +137,7 @@ class RSAEnc{
 		byte[] messagebytes = input.toByteArray();
 
 		// ( 0x00 || 0x02 || r || 0x00 || m )
-		byte[] paddedMessageBytes = new byte[messagebytes.length + randomBytes.length + 3];
+		byte[] paddedMessageBytes = new byte[(N.bitLength()+7)/8];
 
 		paddedMessageBytes[0] = 0;
 		paddedMessageBytes[1] = 2;
@@ -151,8 +148,12 @@ class RSAEnc{
 
 		paddedMessageBytes[randomBytes.length + 2] = 0;
 
+		// writes to the back of the messagesapce as
+		// leading zeros are stripped by big int
+		int	z = N.bitLength()/8 - messagebytes.length;
+
 		for(int i = 0; i < messagebytes.length; i++){
-			paddedMessageBytes[i+randomBytes.length+3] = messagebytes[i];
+			paddedMessageBytes[z+i] = messagebytes[i];
 		}
 
 		paddedElement = new BigInteger(paddedMessageBytes);

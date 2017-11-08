@@ -8,6 +8,15 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/*
+Thomas Jean
+COSC 483
+Project 2
+RSAKeyGen.java will implement the generatation of N, e, and d of an
+RSA public and private key. The generations of the primes and modular
+arithmetic is done by the java BigInteger library.
+*/
+
 
 class RSAKeyGen{
 
@@ -97,6 +106,12 @@ class RSAKeyGen{
 
 		BigInteger N_cal = prime1.multiply(prime2);
 
+		/*
+		if the 2 primes that are n/2 are multiplied then
+		the ouput will be n-1 or n bits long if it is n-1
+		we generate a slightly larger prime to get a n bit
+		prime number.
+		*/
 		while(N_cal.bitLength() != nbits){
 			prime1 = BigInteger.probablePrime(p1bits+1,secRandom);
 			N_cal = prime1.multiply(prime2);
@@ -105,6 +120,7 @@ class RSAKeyGen{
 		prime1 = prime1.subtract(BigInteger.ONE);
 		prime2 = prime2.subtract(BigInteger.ONE);
 
+		// The order of the group is (p-1)(q-1)
 		order = prime1.multiply(prime2);
 
 		N = N_cal;
